@@ -4,9 +4,9 @@
   "version": "0.1.0",
   "identifier": "com.koven.winshaper",
   "build": {
-    "beforeDevCommand": "pnpm dev",
+    "beforeDevCommand": "npm run dev",
     "devUrl": "http://localhost:1420",
-    "beforeBuildCommand": "pnpm build",
+    "beforeBuildCommand": "npm run build",
     "frontendDist": "../dist"
   },
   "app": {
@@ -27,12 +27,6 @@
     ],
     "security": {
       "csp": null
-    },
-    "systemTray": {
-      "iconPath": "icons/icon.ico",
-      "iconAsTemplate": false,
-      "menuOnLeftClick": false,
-      "tooltip": "WinShaper - Windows Customization Hub"
     }
   },
   "bundle": {

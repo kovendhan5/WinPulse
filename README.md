@@ -29,13 +29,13 @@ WinShaper serves as a modular hub for enhancing user control over Windows OS, pr
 ### Getting Started
 ```bash
 # Install dependencies
-pnpm install
+npm install
 
 # Run in development mode
-pnpm tauri dev
+npm run tauri dev
 
 # Build for production
-pnpm tauri build
+npm run tauri build
 ```
 
 ## 📋 Project Status

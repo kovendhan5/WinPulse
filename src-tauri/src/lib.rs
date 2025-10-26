@@ -1,14 +1,215 @@
-// Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
+use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
+use std::fs;
+use std::path::PathBuf;
+use tauri::Manager;
+
+mod modules;
+use modules::ModuleManager;
+
+// Configuration structures matching the frontend types
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ModuleConfig {
+    pub enabled: bool,
+    #[serde(default)]
+    pub settings: HashMap<String, serde_json::Value>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct WinShaperConfig {
+    pub modules: ModulesConfig,
+    pub ui: UiConfig,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ModulesConfig {
+    pub dynamic_split: ModuleConfig,
+    pub taskbar_customizer: ModuleConfig,
+    pub mouse_action_mapper: ModuleConfig,
+    pub process_controller: ModuleConfig,
+    pub clipboard_history: ModuleConfig,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct UiConfig {
+    pub theme: String,
+    pub start_minimized: bool,
+}
+
+impl Default for WinShaperConfig {
+    fn default() -> Self {
+        let mut dynamic_split_settings = HashMap::new();
+        dynamic_split_settings.insert("layouts".to_string(), serde_json::json!(["60-40", "50-50"]));
+        
+        let mut taskbar_settings = HashMap::new();
+        taskbar_settings.insert("theme".to_string(), serde_json::json!("dark"));
+        taskbar_settings.insert("opacity".to_string(), serde_json::json!(100));
+        
+        let mut mouse_settings = HashMap::new();
+        mouse_settings.insert("sensitivity".to_string(), serde_json::json!(50));
+        
+        let mut process_settings = HashMap::new();
+        process_settings.insert("threshold_cpu".to_string(), serde_json::json!(80));
+        process_settings.insert("threshold_ram".to_string(), serde_json::json!(1024));
+        
+        let mut clipboard_settings = HashMap::new();
+        clipboard_settings.insert("max_items".to_string(), serde_json::json!(200));
+        clipboard_settings.insert("expiry_days".to_string(), serde_json::json!(30));
+
+        Self {
+            modules: ModulesConfig {
+                dynamic_split: ModuleConfig { enabled: false, settings: dynamic_split_settings },
+                taskbar_customizer: ModuleConfig { enabled: false, settings: taskbar_settings },
+                mouse_action_mapper: ModuleConfig { enabled: false, settings: mouse_settings },
+                process_controller: ModuleConfig { enabled: false, settings: process_settings },
+                clipboard_history: ModuleConfig { enabled: false, settings: clipboard_settings },
+            },
+            ui: UiConfig {
+                theme: "dark".to_string(),
+                start_minimized: true,
+            },
+        }
+    }
+}
+
+// Get the configuration file path in %APPDATA%/WinShaper/
+fn get_config_path() -> anyhow::Result<PathBuf> {
+    let app_data = dirs::data_dir()
+        .ok_or_else(|| anyhow::anyhow!("Could not find app data directory"))?;
+    
+    let winshaper_dir = app_data.join("WinShaper");
+    
+    // Create directory if it doesn't exist
+    if !winshaper_dir.exists() {
+        fs::create_dir_all(&winshaper_dir)?;
+    }
+    
+    Ok(winshaper_dir.join("config.json"))
+}
+
+// Tauri commands
 #[tauri::command]
-fn greet(name: &str) -> String {
-    format!("Hello, {}! You've been greeted from Rust!", name)
+async fn load_config() -> Result<WinShaperConfig, String> {
+    match get_config_path() {
+        Ok(config_path) => {
+            if config_path.exists() {
+                match fs::read_to_string(&config_path) {
+                    Ok(content) => {
+                        match serde_json::from_str::<WinShaperConfig>(&content) {
+                            Ok(config) => Ok(config),
+                            Err(_) => {
+                                // If config is corrupted, return default
+                                Ok(WinShaperConfig::default())
+                            }
+                        }
+                    }
+                    Err(_) => Ok(WinShaperConfig::default()),
+                }
+            } else {
+                // First time run, return default config
+                Ok(WinShaperConfig::default())
+            }
+        }
+        Err(e) => Err(format!("Failed to get config path: {}", e)),
+    }
+}
+
+#[tauri::command]
+async fn save_config(config: WinShaperConfig) -> Result<(), String> {
+    match get_config_path() {
+        Ok(config_path) => {
+            match serde_json::to_string_pretty(&config) {
+                Ok(json) => {
+                    match fs::write(&config_path, json) {
+                        Ok(_) => {
+                            log::info!("Configuration saved to {:?}", config_path);
+                            Ok(())
+                        }
+                        Err(e) => Err(format!("Failed to write config file: {}", e)),
+                    }
+                }
+                Err(e) => Err(format!("Failed to serialize config: {}", e)),
+            }
+        }
+        Err(e) => Err(format!("Failed to get config path: {}", e)),
+    }
+}
+
+#[tauri::command]
+async fn get_system_info() -> Result<HashMap<String, serde_json::Value>, String> {
+    let mut info = HashMap::new();
+    
+    // Basic system information
+    info.insert("platform".to_string(), serde_json::json!("Windows"));
+    info.insert("app_version".to_string(), serde_json::json!("0.1.0"));
+    
+    // TODO: Add actual system monitoring (RAM usage, CPU, etc.)
+    info.insert("ram_usage_mb".to_string(), serde_json::json!(15)); // Placeholder
+    info.insert("cpu_usage_percent".to_string(), serde_json::json!(0.5)); // Placeholder
+    
+    Ok(info)
+}
+
+// Module management functions (to be implemented)
+#[tauri::command]
+async fn enable_module(module_name: String) -> Result<(), String> {
+    log::info!("Enabling module: {}", module_name);
+    
+    match module_name.as_str() {
+        "dynamic_split" => {
+            // TODO: Initialize window management hooks
+            Ok(())
+        }
+        "taskbar_customizer" => {
+            // TODO: Initialize taskbar customization
+            Ok(())
+        }
+        "mouse_action_mapper" => {
+            // TODO: Initialize mouse hooks
+            Ok(())
+        }
+        "process_controller" => {
+            // TODO: Initialize process monitoring
+            Ok(())
+        }
+        "clipboard_history" => {
+            // TODO: Initialize clipboard monitoring
+            Ok(())
+        }
+        _ => Err(format!("Unknown module: {}", module_name)),
+    }
+}
+
+#[tauri::command]
+async fn disable_module(module_name: String) -> Result<(), String> {
+    log::info!("Disabling module: {}", module_name);
+    
+    // TODO: Implement module cleanup
+    Ok(())
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+    env_logger::init();
+    
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
-        .invoke_handler(tauri::generate_handler![greet])
+        .setup(|app| {
+            // Initialize logging
+            log::info!("WinShaper starting up...");
+            
+            // Setup system tray (will be implemented later)
+            // TODO: Setup system tray icon and menu
+            
+            Ok(())
+        })
+        .invoke_handler(tauri::generate_handler![
+            load_config,
+            save_config,
+            get_system_info,
+            enable_module,
+            disable_module
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
