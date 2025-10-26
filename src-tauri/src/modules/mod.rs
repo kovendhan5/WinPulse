@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 /// Trait that all WinShaper modules must implement
-pub trait Module {
+pub trait Module: Send + Sync {
     fn name(&self) -> &'static str;
     fn description(&self) -> &'static str;
     fn is_enabled(&self) -> bool;
