@@ -2,10 +2,17 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fs;
 use std::path::PathBuf;
+use std::sync::Mutex;
 use tauri::Manager;
 
 mod modules;
+use modules::process_controller::{ProcessController, ProcessInfo};
 use modules::ModuleManager;
+
+// Global state for process controller
+struct AppState {
+    process_controller: Mutex<ProcessController>,
+}
 
 // Configuration structures matching the frontend types
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -188,18 +195,39 @@ async fn disable_module(module_name: String) -> Result<(), String> {
     Ok(())
 }
 
+// Process Controller commands
+#[tauri::command]
+async fn get_running_processes(state: tauri::State<'_, AppState>) -> Result<Vec<ProcessInfo>, String> {
+    let mut controller = state.process_controller.lock().map_err(|e| e.to_string())?;
+    controller.get_running_processes().map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+async fn terminate_process(pid: u32, state: tauri::State<'_, AppState>) -> Result<(), String> {
+    let mut controller = state.process_controller.lock().map_err(|e| e.to_string())?;
+    controller.terminate_process(pid).map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+async fn check_process_thresholds(state: tauri::State<'_, AppState>) -> Result<Vec<ProcessInfo>, String> {
+    let mut controller = state.process_controller.lock().map_err(|e| e.to_string())?;
+    controller.check_thresholds().map_err(|e| e.to_string())
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     env_logger::init();
     
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
+        .manage(AppState {
+            process_controller: Mutex::new(ProcessController::new()),
+        })
         .setup(|app| {
             // Initialize logging
             log::info!("WinShaper starting up...");
-            
-            // Setup system tray (will be implemented later)
-            // TODO: Setup system tray icon and menu
+            log::info!("Platform: Windows");
+            log::info!("Version: 0.1.0 (MVP)");
             
             Ok(())
         })
@@ -208,7 +236,10 @@ pub fn run() {
             save_config,
             get_system_info,
             enable_module,
-            disable_module
+            disable_module,
+            get_running_processes,
+            terminate_process,
+            check_process_thresholds
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

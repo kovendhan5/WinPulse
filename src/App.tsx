@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { invoke } from "@tauri-apps/api/core";
+import { ProcessController } from "./components/ProcessController";
 import "./App.css";
 
 // Types for our module configuration
@@ -38,6 +39,7 @@ function App() {
   });
 
   const [isLoading, setIsLoading] = useState(true);
+  const [activeModule, setActiveModule] = useState<string | null>(null);
 
   // Load configuration on startup
   useEffect(() => {
@@ -99,110 +101,132 @@ function App() {
         <p className="subtitle">Windows Customization Hub</p>
       </header>
 
-      <div className="modules-grid">
-        {/* Dynamic Window Splitting */}
-        <div className={`module-card ${config.modules.dynamic_split.enabled ? 'enabled' : ''}`}>
-          <div className="module-header">
-            <h3>📐 Dynamic Splitting</h3>
-            <label className="toggle-switch">
-              <input
-                type="checkbox"
-                checked={config.modules.dynamic_split.enabled}
-                onChange={() => toggleModule('dynamic_split')}
-              />
-              <span className="slider"></span>
-            </label>
-          </div>
-          <p>Split screen into custom shapes (60/40, L/T) with hotkey cycling</p>
-          <div className="module-status">
-            Status: {config.modules.dynamic_split.enabled ? '🟢 Active' : '⚫ Disabled'}
-          </div>
+      {activeModule === 'process_controller' ? (
+        <div>
+          <button 
+            onClick={() => setActiveModule(null)} 
+            className="back-btn"
+          >
+            ← Back to Dashboard
+          </button>
+          <ProcessController />
         </div>
+      ) : (
+        <>
+          <div className="modules-grid">
+            {/* Dynamic Window Splitting */}
+            <div className={`module-card ${config.modules.dynamic_split.enabled ? 'enabled' : ''}`}>
+              <div className="module-header">
+                <h3>📐 Dynamic Splitting</h3>
+                <label className="toggle-switch">
+                  <input
+                    type="checkbox"
+                    checked={config.modules.dynamic_split.enabled}
+                    onChange={() => toggleModule('dynamic_split')}
+                  />
+                  <span className="slider"></span>
+                </label>
+              </div>
+              <p>Split screen into custom shapes (60/40, L/T) with hotkey cycling</p>
+              <div className="module-status">
+                Status: {config.modules.dynamic_split.enabled ? '🟢 Active' : '⚫ Disabled'}
+              </div>
+            </div>
 
-        {/* Taskbar Customizer */}
-        <div className={`module-card ${config.modules.taskbar_customizer.enabled ? 'enabled' : ''}`}>
-          <div className="module-header">
-            <h3>🎨 Taskbar Customizer</h3>
-            <label className="toggle-switch">
-              <input
-                type="checkbox"
-                checked={config.modules.taskbar_customizer.enabled}
-                onChange={() => toggleModule('taskbar_customizer')}
-              />
-              <span className="slider"></span>
-            </label>
-          </div>
-          <p>Hide/show elements, resize icons, theme selection</p>
-          <div className="module-status">
-            Status: {config.modules.taskbar_customizer.enabled ? '🟢 Active' : '⚫ Disabled'}
-          </div>
-        </div>
+            {/* Taskbar Customizer */}
+            <div className={`module-card ${config.modules.taskbar_customizer.enabled ? 'enabled' : ''}`}>
+              <div className="module-header">
+                <h3>🎨 Taskbar Customizer</h3>
+                <label className="toggle-switch">
+                  <input
+                    type="checkbox"
+                    checked={config.modules.taskbar_customizer.enabled}
+                    onChange={() => toggleModule('taskbar_customizer')}
+                  />
+                  <span className="slider"></span>
+                </label>
+              </div>
+              <p>Hide/show elements, resize icons, theme selection</p>
+              <div className="module-status">
+                Status: {config.modules.taskbar_customizer.enabled ? '🟢 Active' : '⚫ Disabled'}
+              </div>
+            </div>
 
-        {/* Mouse Action Mapper */}
-        <div className={`module-card ${config.modules.mouse_action_mapper.enabled ? 'enabled' : ''}`}>
-          <div className="module-header">
-            <h3>🖱️ Mouse Action Mapper</h3>
-            <label className="toggle-switch">
-              <input
-                type="checkbox"
-                checked={config.modules.mouse_action_mapper.enabled}
-                onChange={() => toggleModule('mouse_action_mapper')}
-              />
-              <span className="slider"></span>
-            </label>
-          </div>
-          <p>Map clicks/gestures to actions (screenshots, app launch)</p>
-          <div className="module-status">
-            Status: {config.modules.mouse_action_mapper.enabled ? '🟢 Active' : '⚫ Disabled'}
-          </div>
-        </div>
+            {/* Mouse Action Mapper */}
+            <div className={`module-card ${config.modules.mouse_action_mapper.enabled ? 'enabled' : ''}`}>
+              <div className="module-header">
+                <h3>🖱️ Mouse Action Mapper</h3>
+                <label className="toggle-switch">
+                  <input
+                    type="checkbox"
+                    checked={config.modules.mouse_action_mapper.enabled}
+                    onChange={() => toggleModule('mouse_action_mapper')}
+                  />
+                  <span className="slider"></span>
+                </label>
+              </div>
+              <p>Map clicks/gestures to actions (screenshots, app launch)</p>
+              <div className="module-status">
+                Status: {config.modules.mouse_action_mapper.enabled ? '🟢 Active' : '⚫ Disabled'}
+              </div>
+            </div>
 
-        {/* Process Controller */}
-        <div className={`module-card ${config.modules.process_controller.enabled ? 'enabled' : ''}`}>
-          <div className="module-header">
-            <h3>⚡ Process Controller</h3>
-            <label className="toggle-switch">
-              <input
-                type="checkbox"
-                checked={config.modules.process_controller.enabled}
-                onChange={() => toggleModule('process_controller')}
-              />
-              <span className="slider"></span>
-            </label>
-          </div>
-          <p>Monitor, suspend, or kill resource-heavy processes</p>
-          <div className="module-status">
-            Status: {config.modules.process_controller.enabled ? '🟢 Active' : '⚫ Disabled'}
-          </div>
-        </div>
+            {/* Process Controller */}
+            <div className={`module-card ${config.modules.process_controller.enabled ? 'enabled' : ''}`}>
+              <div className="module-header">
+                <h3>⚡ Process Controller</h3>
+                <label className="toggle-switch">
+                  <input
+                    type="checkbox"
+                    checked={config.modules.process_controller.enabled}
+                    onChange={() => toggleModule('process_controller')}
+                  />
+                  <span className="slider"></span>
+                </label>
+              </div>
+              <p>Monitor, suspend, or kill resource-heavy processes</p>
+              <div className="module-status">
+                Status: {config.modules.process_controller.enabled ? '🟢 Active' : '⚫ Disabled'}
+              </div>
+              {config.modules.process_controller.enabled && (
+                <button 
+                  onClick={() => setActiveModule('process_controller')}
+                  className="view-details-btn"
+                >
+                  View Details →
+                </button>
+              )}
+            </div>
 
-        {/* Clipboard History */}
-        <div className={`module-card ${config.modules.clipboard_history.enabled ? 'enabled' : ''}`}>
-          <div className="module-header">
-            <h3>📋 Clipboard History</h3>
-            <label className="toggle-switch">
-              <input
-                type="checkbox"
-                checked={config.modules.clipboard_history.enabled}
-                onChange={() => toggleModule('clipboard_history')}
-              />
-              <span className="slider"></span>
-            </label>
+            {/* Clipboard History */}
+            <div className={`module-card ${config.modules.clipboard_history.enabled ? 'enabled' : ''}`}>
+              <div className="module-header">
+                <h3>📋 Clipboard History</h3>
+                <label className="toggle-switch">
+                  <input
+                    type="checkbox"
+                    checked={config.modules.clipboard_history.enabled}
+                    onChange={() => toggleModule('clipboard_history')}
+                  />
+                  <span className="slider"></span>
+                </label>
+              </div>
+              <p>Persistent history with search and quick paste</p>
+              <div className="module-status">
+                Status: {config.modules.clipboard_history.enabled ? '🟢 Active' : '⚫ Disabled'}
+              </div>
+            </div>
           </div>
-          <p>Persistent history with search and quick paste</p>
-          <div className="module-status">
-            Status: {config.modules.clipboard_history.enabled ? '🟢 Active' : '⚫ Disabled'}
-          </div>
-        </div>
-      </div>
 
-      <footer className="app-footer">
-        <div className="system-info">
-          <span>💾 RAM Usage: &lt; 20MB</span>
-          <span>🚀 Status: Running</span>
-          <span>📊 {Object.values(config.modules).filter(m => m.enabled).length}/5 Modules Active</span>
-        </div>
-      </footer>
+          <footer className="app-footer">
+            <div className="system-info">
+              <span>💾 RAM Usage: &lt; 20MB</span>
+              <span>🚀 Status: Running</span>
+              <span>📊 {Object.values(config.modules).filter(m => m.enabled).length}/5 Modules Active</span>
+            </div>
+          </footer>
+        </>
+      )}
     </main>
   );
 }
