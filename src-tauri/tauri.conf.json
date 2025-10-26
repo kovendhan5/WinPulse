@@ -1,24 +1,38 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "winshaper",
+  "productName": "WinShaper",
   "version": "0.1.0",
   "identifier": "com.koven.winshaper",
   "build": {
-    "beforeDevCommand": "pnpm dev",
+    "beforeDevCommand": "npm run dev",
     "devUrl": "http://localhost:1420",
-    "beforeBuildCommand": "pnpm build",
+    "beforeBuildCommand": "npm run build",
     "frontendDist": "../dist"
   },
   "app": {
     "windows": [
       {
-        "title": "winshaper",
-        "width": 800,
-        "height": 600
+        "title": "WinShaper - Windows Customization Hub",
+        "width": 1000,
+        "height": 700,
+        "minWidth": 800,
+        "minHeight": 600,
+        "center": true,
+        "resizable": true,
+        "maximizable": true,
+        "minimizable": true,
+        "closable": true,
+        "decorations": true
       }
     ],
     "security": {
       "csp": null
+    },
+    "systemTray": {
+      "iconPath": "icons/icon.ico",
+      "iconAsTemplate": false,
+      "menuOnLeftClick": false,
+      "tooltip": "WinShaper - Windows Customization Hub"
     }
   },
   "bundle": {
