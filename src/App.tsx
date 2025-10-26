@@ -40,11 +40,26 @@ function App() {
 
   const [isLoading, setIsLoading] = useState(true);
   const [activeModule, setActiveModule] = useState<string | null>(null);
+  const [systemInfo, setSystemInfo] = useState<any>(null);
 
   // Load configuration on startup
   useEffect(() => {
     loadConfig();
+    loadSystemInfo();
+    
+    // Update system info every 5 seconds
+    const interval = setInterval(loadSystemInfo, 5000);
+    return () => clearInterval(interval);
   }, []);
+
+  async function loadSystemInfo() {
+    try {
+      const info = await invoke("get_system_info");
+      setSystemInfo(info);
+    } catch (error) {
+      console.error("Failed to load system info:", error);
+    }
+  }
 
   async function loadConfig() {
     try {
@@ -220,7 +235,7 @@ function App() {
 
           <footer className="app-footer">
             <div className="system-info">
-              <span>💾 RAM Usage: &lt; 20MB</span>
+              <span>💾 RAM Usage: {systemInfo?.ram_usage_mb ? `${systemInfo.ram_usage_mb.toFixed(1)} MB` : '< 20MB'}</span>
               <span>🚀 Status: Running</span>
               <span>📊 {Object.values(config.modules).filter(m => m.enabled).length}/5 Modules Active</span>
             </div>

@@ -152,6 +152,29 @@ body {
   border: 1px solid var(--border-color);
 }
 
+.view-details-btn,
+.back-btn {
+  margin-top: 1rem;
+  padding: 0.7rem 1.5rem;
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.view-details-btn:hover,
+.back-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 102, 255, 0.4);
+}
+
+.back-btn {
+  margin-bottom: 1.5rem;
+}
+
 /* Toggle Switch */
 .toggle-switch {
   position: relative;

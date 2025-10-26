@@ -150,8 +150,27 @@ async fn get_system_info() -> Result<HashMap<String, serde_json::Value>, String>
     info.insert("platform".to_string(), serde_json::json!("Windows"));
     info.insert("app_version".to_string(), serde_json::json!("0.1.0"));
     
-    // TODO: Add actual system monitoring (RAM usage, CPU, etc.)
-    info.insert("ram_usage_mb".to_string(), serde_json::json!(15)); // Placeholder
+    // Get current process memory usage
+    unsafe {
+        use windows::Win32::System::ProcessStatus::{GetProcessMemoryInfo, PROCESS_MEMORY_COUNTERS};
+        use windows::Win32::System::Threading::GetCurrentProcess;
+        
+        let process = GetCurrentProcess();
+        let mut mem_counters: PROCESS_MEMORY_COUNTERS = std::mem::zeroed();
+        mem_counters.cb = std::mem::size_of::<PROCESS_MEMORY_COUNTERS>() as u32;
+        
+        if GetProcessMemoryInfo(
+            process,
+            &mut mem_counters,
+            std::mem::size_of::<PROCESS_MEMORY_COUNTERS>() as u32,
+        ).is_ok() {
+            let ram_mb = mem_counters.WorkingSetSize as f64 / (1024.0 * 1024.0);
+            info.insert("ram_usage_mb".to_string(), serde_json::json!(ram_mb));
+        } else {
+            info.insert("ram_usage_mb".to_string(), serde_json::json!(0.0));
+        }
+    }
+    
     info.insert("cpu_usage_percent".to_string(), serde_json::json!(0.5)); // Placeholder
     
     Ok(info)
