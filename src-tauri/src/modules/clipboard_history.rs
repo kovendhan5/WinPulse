@@ -2,7 +2,7 @@ use super::Module;
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 use serde::{Deserialize, Serialize};
-use chrono::{DateTime, Utc};
+use chrono::Utc;
 use arboard::Clipboard;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

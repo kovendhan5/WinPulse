@@ -3,12 +3,13 @@ use std::collections::HashMap;
 use std::fs;
 use std::path::PathBuf;
 use std::sync::Mutex;
-use tauri::Manager;
 
 mod modules;
-use modules::process_controller::{ProcessController, ProcessInfo};
-use modules::clipboard_history::{ClipboardHistory, ClipboardItem};
-use modules::ModuleManager;
+use modules::Module;
+use modules::{
+    process_controller::{ProcessController, ProcessInfo},
+    clipboard_history::{ClipboardHistory, ClipboardItem},
+};
 
 // Global state for process controller
 struct AppState {

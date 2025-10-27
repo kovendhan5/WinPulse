@@ -115,7 +115,7 @@ impl ProcessController {
             mem::size_of::<windows::Win32::Foundation::HMODULE>() as u32,
             &mut cb_needed,
         )
-        .is_ok()
+        .as_bool()
         {
             let mut name_buffer: [u16; 260] = [0; 260];
             let len = GetModuleBaseNameW(
