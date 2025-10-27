@@ -7,11 +7,13 @@ use tauri::Manager;
 
 mod modules;
 use modules::process_controller::{ProcessController, ProcessInfo};
+use modules::clipboard_history::{ClipboardHistory, ClipboardItem};
 use modules::ModuleManager;
 
 // Global state for process controller
 struct AppState {
     process_controller: Mutex<ProcessController>,
+    clipboard_history: Mutex<ClipboardHistory>,
 }
 
 // Configuration structures matching the frontend types
@@ -178,7 +180,7 @@ async fn get_system_info() -> Result<HashMap<String, serde_json::Value>, String>
 
 // Module management functions (to be implemented)
 #[tauri::command]
-async fn enable_module(module_name: String) -> Result<(), String> {
+async fn enable_module(module_name: String, state: tauri::State<'_, AppState>) -> Result<(), String> {
     log::info!("Enabling module: {}", module_name);
     
     match module_name.as_str() {
@@ -195,23 +197,28 @@ async fn enable_module(module_name: String) -> Result<(), String> {
             Ok(())
         }
         "process_controller" => {
-            // TODO: Initialize process monitoring
+            // Already initialized in app state
             Ok(())
         }
         "clipboard_history" => {
-            // TODO: Initialize clipboard monitoring
-            Ok(())
+            let mut clipboard = state.clipboard_history.lock().map_err(|e| e.to_string())?;
+            clipboard.enable().map_err(|e| e.to_string())
         }
         _ => Err(format!("Unknown module: {}", module_name)),
     }
 }
 
 #[tauri::command]
-async fn disable_module(module_name: String) -> Result<(), String> {
+async fn disable_module(module_name: String, state: tauri::State<'_, AppState>) -> Result<(), String> {
     log::info!("Disabling module: {}", module_name);
     
-    // TODO: Implement module cleanup
-    Ok(())
+    match module_name.as_str() {
+        "clipboard_history" => {
+            let mut clipboard = state.clipboard_history.lock().map_err(|e| e.to_string())?;
+            clipboard.disable().map_err(|e| e.to_string())
+        }
+        _ => Ok(())
+    }
 }
 
 // Process Controller commands
@@ -233,6 +240,37 @@ async fn check_process_thresholds(state: tauri::State<'_, AppState>) -> Result<V
     controller.check_thresholds().map_err(|e| e.to_string())
 }
 
+// Clipboard History commands
+#[tauri::command]
+async fn get_clipboard_history(state: tauri::State<'_, AppState>) -> Result<Vec<ClipboardItem>, String> {
+    let clipboard = state.clipboard_history.lock().map_err(|e| e.to_string())?;
+    clipboard.get_history().map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+async fn search_clipboard(query: String, state: tauri::State<'_, AppState>) -> Result<Vec<ClipboardItem>, String> {
+    let clipboard = state.clipboard_history.lock().map_err(|e| e.to_string())?;
+    clipboard.search_history(&query).map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+async fn copy_clipboard_item(id: u64, state: tauri::State<'_, AppState>) -> Result<(), String> {
+    let mut clipboard = state.clipboard_history.lock().map_err(|e| e.to_string())?;
+    clipboard.copy_to_clipboard(id).map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+async fn clear_clipboard_history(state: tauri::State<'_, AppState>) -> Result<(), String> {
+    let mut clipboard = state.clipboard_history.lock().map_err(|e| e.to_string())?;
+    clipboard.clear_history().map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+async fn check_clipboard(state: tauri::State<'_, AppState>) -> Result<(), String> {
+    let mut clipboard = state.clipboard_history.lock().map_err(|e| e.to_string())?;
+    clipboard.check_clipboard().map_err(|e| e.to_string())
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     env_logger::init();
@@ -241,6 +279,7 @@ pub fn run() {
         .plugin(tauri_plugin_opener::init())
         .manage(AppState {
             process_controller: Mutex::new(ProcessController::new()),
+            clipboard_history: Mutex::new(ClipboardHistory::new()),
         })
         .setup(|app| {
             // Initialize logging
@@ -258,7 +297,12 @@ pub fn run() {
             disable_module,
             get_running_processes,
             terminate_process,
-            check_process_thresholds
+            check_process_thresholds,
+            get_clipboard_history,
+            search_clipboard,
+            copy_clipboard_item,
+            clear_clipboard_history,
+            check_clipboard
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
