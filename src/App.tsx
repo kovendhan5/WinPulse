@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
-import { invoke } from "@tauri-apps/api/core";
-import { ProcessController } from "./components/ProcessController";
-import "./App.css";
+import { useState, useEffect } from 'react';
+import { invoke } from '@tauri-apps/api/core';
+import './App.css';
+import { ProcessController } from './components/ProcessController';
+import { ClipboardHistory } from './components/ClipboardHistory';
 
 // Types for our module configuration
 interface ModuleConfig {
@@ -126,6 +127,16 @@ function App() {
           </button>
           <ProcessController />
         </div>
+      ) : activeModule === 'clipboard_history' ? (
+        <div>
+          <button 
+            onClick={() => setActiveModule(null)} 
+            className="back-btn"
+          >
+            ← Back to Dashboard
+          </button>
+          <ClipboardHistory />
+        </div>
       ) : (
         <>
           <div className="modules-grid">
@@ -230,6 +241,14 @@ function App() {
               <div className="module-status">
                 Status: {config.modules.clipboard_history.enabled ? '🟢 Active' : '⚫ Disabled'}
               </div>
+              {config.modules.clipboard_history.enabled && (
+                <button 
+                  onClick={() => setActiveModule('clipboard_history')}
+                  className="view-details-btn"
+                >
+                  View Details →
+                </button>
+              )}
             </div>
           </div>
 
@@ -245,7 +264,5 @@ function App() {
     </main>
   );
 }
-
-export default App;
 
 export default App;
