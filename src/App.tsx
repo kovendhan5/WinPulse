@@ -3,6 +3,7 @@ import { invoke } from '@tauri-apps/api/core';
 import './App.css';
 import { ProcessController } from './components/ProcessController';
 import { ClipboardHistory } from './components/ClipboardHistory';
+import { DynamicSplit } from './components/DynamicSplit';
 
 // Types for our module configuration
 interface ModuleConfig {
@@ -127,6 +128,16 @@ function App() {
           </button>
           <ProcessController />
         </div>
+      ) : activeModule === 'dynamic_split' ? (
+        <div>
+          <button 
+            onClick={() => setActiveModule(null)} 
+            className="back-btn"
+          >
+            ← Back to Dashboard
+          </button>
+          <DynamicSplit />
+        </div>
       ) : activeModule === 'clipboard_history' ? (
         <div>
           <button 
@@ -157,6 +168,14 @@ function App() {
               <div className="module-status">
                 Status: {config.modules.dynamic_split.enabled ? '🟢 Active' : '⚫ Disabled'}
               </div>
+              {config.modules.dynamic_split.enabled && (
+                <button 
+                  onClick={() => setActiveModule('dynamic_split')}
+                  className="view-details-btn"
+                >
+                  View Details →
+                </button>
+              )}
             </div>
 
             {/* Taskbar Customizer */}
