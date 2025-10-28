@@ -9,12 +9,14 @@ use modules::Module;
 use modules::{
     process_controller::{ProcessController, ProcessInfo},
     clipboard_history::{ClipboardHistory, ClipboardItem},
+    dynamic_split::DynamicSplit,
 };
 
 // Global state for process controller
 struct AppState {
     process_controller: Mutex<ProcessController>,
     clipboard_history: Mutex<ClipboardHistory>,
+    dynamic_split: Mutex<DynamicSplit>,
 }
 
 // Configuration structures matching the frontend types
@@ -186,8 +188,8 @@ async fn enable_module(module_name: String, state: tauri::State<'_, AppState>) -
     
     match module_name.as_str() {
         "dynamic_split" => {
-            // TODO: Initialize window management hooks
-            Ok(())
+            let mut ds = state.dynamic_split.lock().map_err(|e| e.to_string())?;
+            ds.enable().map_err(|e| e.to_string())
         }
         "taskbar_customizer" => {
             // TODO: Initialize taskbar customization
@@ -214,6 +216,10 @@ async fn disable_module(module_name: String, state: tauri::State<'_, AppState>) 
     log::info!("Disabling module: {}", module_name);
     
     match module_name.as_str() {
+        "dynamic_split" => {
+            let mut ds = state.dynamic_split.lock().map_err(|e| e.to_string())?;
+            ds.disable().map_err(|e| e.to_string())
+        }
         "clipboard_history" => {
             let mut clipboard = state.clipboard_history.lock().map_err(|e| e.to_string())?;
             clipboard.disable().map_err(|e| e.to_string())
@@ -272,6 +278,12 @@ async fn check_clipboard(state: tauri::State<'_, AppState>) -> Result<(), String
     clipboard.check_clipboard().map_err(|e| e.to_string())
 }
 
+#[tauri::command]
+async fn apply_window_layout(layout: String, state: tauri::State<'_, AppState>) -> Result<(), String> {
+    let mut ds = state.dynamic_split.lock().map_err(|e| e.to_string())?;
+    ds.apply_layout(&layout).map_err(|e| e.to_string())
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     env_logger::init();
@@ -281,6 +293,7 @@ pub fn run() {
         .manage(AppState {
             process_controller: Mutex::new(ProcessController::new()),
             clipboard_history: Mutex::new(ClipboardHistory::new()),
+            dynamic_split: Mutex::new(DynamicSplit::new()),
         })
         .setup(|app| {
             // Initialize logging
@@ -303,7 +316,8 @@ pub fn run() {
             search_clipboard,
             copy_clipboard_item,
             clear_clipboard_history,
-            check_clipboard
+                check_clipboard,
+                apply_window_layout
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

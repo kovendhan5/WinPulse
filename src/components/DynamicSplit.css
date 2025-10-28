@@ -1,0 +1,39 @@
+.dynamic-split {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.dynamic-split h2 {
+  color: #fff;
+}
+
+.layout-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.layout-buttons button {
+  padding: 0.6rem 0.9rem;
+  border-radius: 6px;
+  border: none;
+  background: #4a90e2;
+  color: white;
+  cursor: pointer;
+  transition: transform 0.12s ease, background 0.12s ease;
+}
+
+.layout-buttons button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  background: #357abd;
+}
+
+.message {
+  margin-top: 1rem;
+  color: #ddd;
+  background: #222;
+  padding: 0.75rem;
+  border-radius: 6px;
+}
