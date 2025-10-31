@@ -10,6 +10,7 @@ use modules::{
     process_controller::{ProcessController, ProcessInfo},
     clipboard_history::{ClipboardHistory, ClipboardItem},
     dynamic_split::DynamicSplit,
+    taskbar_customizer::TaskbarCustomizer,
 };
 
 // Global state for process controller
@@ -17,6 +18,7 @@ struct AppState {
     process_controller: Mutex<ProcessController>,
     clipboard_history: Mutex<ClipboardHistory>,
     dynamic_split: Mutex<DynamicSplit>,
+    taskbar_customizer: Mutex<TaskbarCustomizer>,
 }
 
 // Configuration structures matching the frontend types
@@ -192,8 +194,8 @@ async fn enable_module(module_name: String, state: tauri::State<'_, AppState>) -
             ds.enable().map_err(|e| e.to_string())
         }
         "taskbar_customizer" => {
-            // TODO: Initialize taskbar customization
-            Ok(())
+            let mut tc = state.taskbar_customizer.lock().map_err(|e| e.to_string())?;
+            tc.enable().map_err(|e| e.to_string())
         }
         "mouse_action_mapper" => {
             // TODO: Initialize mouse hooks
@@ -219,6 +221,10 @@ async fn disable_module(module_name: String, state: tauri::State<'_, AppState>) 
         "dynamic_split" => {
             let mut ds = state.dynamic_split.lock().map_err(|e| e.to_string())?;
             ds.disable().map_err(|e| e.to_string())
+        }
+        "taskbar_customizer" => {
+            let mut tc = state.taskbar_customizer.lock().map_err(|e| e.to_string())?;
+            tc.disable().map_err(|e| e.to_string())
         }
         "clipboard_history" => {
             let mut clipboard = state.clipboard_history.lock().map_err(|e| e.to_string())?;
@@ -284,6 +290,25 @@ async fn apply_window_layout(layout: String, state: tauri::State<'_, AppState>) 
     ds.apply_layout(&layout).map_err(|e| e.to_string())
 }
 
+#[tauri::command]
+async fn cycle_window_layout(state: tauri::State<'_, AppState>) -> Result<(), String> {
+    let mut ds = state.dynamic_split.lock().map_err(|e| e.to_string())?;
+    ds.cycle_layout().map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+async fn toggle_taskbar(state: tauri::State<'_, AppState>) -> Result<bool, String> {
+    let mut tc = state.taskbar_customizer.lock().map_err(|e| e.to_string())?;
+    tc.toggle_taskbar().map_err(|e| e.to_string())?;
+    Ok(tc.is_taskbar_visible())
+}
+
+#[tauri::command]
+async fn get_taskbar_status(state: tauri::State<'_, AppState>) -> Result<bool, String> {
+    let tc = state.taskbar_customizer.lock().map_err(|e| e.to_string())?;
+    Ok(tc.is_taskbar_visible())
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     env_logger::init();
@@ -294,6 +319,7 @@ pub fn run() {
             process_controller: Mutex::new(ProcessController::new()),
             clipboard_history: Mutex::new(ClipboardHistory::new()),
             dynamic_split: Mutex::new(DynamicSplit::new()),
+            taskbar_customizer: Mutex::new(TaskbarCustomizer::new()),
         })
         .setup(|app| {
             // Initialize logging
@@ -316,8 +342,11 @@ pub fn run() {
             search_clipboard,
             copy_clipboard_item,
             clear_clipboard_history,
-                check_clipboard,
-                apply_window_layout
+            check_clipboard,
+            apply_window_layout,
+            cycle_window_layout,
+            toggle_taskbar,
+            get_taskbar_status
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

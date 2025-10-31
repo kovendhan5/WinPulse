@@ -1,0 +1,121 @@
+.taskbar-customizer {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.taskbar-customizer h2 {
+  color: #fff;
+  margin-bottom: 0.5rem;
+}
+
+.taskbar-customizer p {
+  color: #aaa;
+  margin-bottom: 1.5rem;
+}
+
+.control-section {
+  background: #1a1a1a;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid #333;
+}
+
+.control-section h3 {
+  color: #fff;
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+}
+
+.toggle-control {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.toggle-btn {
+  width: 100%;
+  max-width: 400px;
+  padding: 1.2rem;
+  border-radius: 10px;
+  border: none;
+  font-size: 1.2rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.toggle-btn.visible {
+  background: linear-gradient(135deg, #27ae60, #229954);
+  color: white;
+}
+
+.toggle-btn.visible:hover:not(:disabled) {
+  background: linear-gradient(135deg, #229954, #1e8449);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(39, 174, 96, 0.4);
+}
+
+.toggle-btn.hidden {
+  background: linear-gradient(135deg, #e74c3c, #c0392b);
+  color: white;
+}
+
+.toggle-btn.hidden:hover:not(:disabled) {
+  background: linear-gradient(135deg, #c0392b, #a93226);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(231, 76, 60, 0.4);
+}
+
+.toggle-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.status-text {
+  color: #ddd;
+  font-size: 1rem;
+  margin: 0;
+  text-align: center;
+}
+
+.status-text strong {
+  color: #4a90e2;
+}
+
+.info-box {
+  background: #2a2a2a;
+  border-left: 4px solid #4a90e2;
+  border-radius: 6px;
+  padding: 1rem 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.info-box h4 {
+  color: #4a90e2;
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+  font-size: 1rem;
+}
+
+.info-box ul {
+  margin: 0;
+  padding-left: 1.5rem;
+  color: #ccc;
+}
+
+.info-box li {
+  margin-bottom: 0.5rem;
+}
+
+.message {
+  margin-top: 1rem;
+  color: #ddd;
+  background: #222;
+  padding: 0.75rem;
+  border-radius: 6px;
+  text-align: center;
+}

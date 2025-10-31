@@ -12,6 +12,7 @@ use windows::Win32::UI::WindowsAndMessaging::{
 pub struct DynamicSplit {
     enabled: bool,
     layouts: Vec<String>,
+    current_layout_index: usize,
     settings: HashMap<String, Value>,
 }
 
@@ -19,7 +20,8 @@ impl DynamicSplit {
     pub fn new() -> Self {
         Self {
             enabled: false,
-            layouts: vec!["60-40".to_string(), "50-50".to_string()],
+            layouts: vec!["left".to_string(), "right".to_string(), "left-60".to_string(), "right-60".to_string(), "center".to_string()],
+            current_layout_index: 0,
             settings: HashMap::new(),
         }
     }
@@ -52,6 +54,18 @@ impl DynamicSplit {
 
             Ok(())
         }
+    }
+
+    /// Cycle to the next layout and apply it to the foreground window
+    pub fn cycle_layout(&mut self) -> Result<()> {
+        if self.layouts.is_empty() {
+            return Err(anyhow::anyhow!("No layouts configured"));
+        }
+        
+        self.current_layout_index = (self.current_layout_index + 1) % self.layouts.len();
+        let layout = self.layouts[self.current_layout_index].clone();
+        log::info!("Cycling to layout: {}", layout);
+        self.apply_layout(&layout)
     }
 }
 

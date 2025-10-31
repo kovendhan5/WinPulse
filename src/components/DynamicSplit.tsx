@@ -11,9 +11,22 @@ export function DynamicSplit() {
     setMessage(null);
     try {
       await invoke('apply_window_layout', { layout });
-      setMessage(`Applied layout: ${layout}`);
+      setMessage(`✅ Applied layout: ${layout}`);
     } catch (e: any) {
-      setMessage(`Failed: ${e?.toString()}`);
+      setMessage(`❌ Failed: ${e?.toString()}`);
+    } finally {
+      setIsApplying(false);
+    }
+  };
+
+  const cycle = async () => {
+    setIsApplying(true);
+    setMessage(null);
+    try {
+      await invoke('cycle_window_layout');
+      setMessage(`✅ Cycled to next layout`);
+    } catch (e: any) {
+      setMessage(`❌ Failed: ${e?.toString()}`);
     } finally {
       setIsApplying(false);
     }
@@ -23,6 +36,13 @@ export function DynamicSplit() {
     <div className="dynamic-split">
       <h2>📐 Dynamic Window Splitting</h2>
       <p>Apply a layout to the currently focused window.</p>
+
+      <div className="cycle-section">
+        <button onClick={cycle} disabled={isApplying} className="cycle-btn">
+          🔄 Cycle Layouts (Hotkey)
+        </button>
+        <p className="hint">Focus a window, then click to cycle through layouts</p>
+      </div>
 
       <div className="layout-buttons">
         <button onClick={() => apply('left')} disabled={isApplying}>Left (50%)</button>

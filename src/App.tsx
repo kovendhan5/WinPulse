@@ -4,6 +4,7 @@ import './App.css';
 import { ProcessController } from './components/ProcessController';
 import { ClipboardHistory } from './components/ClipboardHistory';
 import { DynamicSplit } from './components/DynamicSplit';
+import { TaskbarCustomizer } from './components/TaskbarCustomizer';
 
 // Types for our module configuration
 interface ModuleConfig {
@@ -148,6 +149,16 @@ function App() {
           </button>
           <ClipboardHistory />
         </div>
+      ) : activeModule === 'taskbar_customizer' ? (
+        <div>
+          <button 
+            onClick={() => setActiveModule(null)} 
+            className="back-btn"
+          >
+            ← Back to Dashboard
+          </button>
+          <TaskbarCustomizer />
+        </div>
       ) : (
         <>
           <div className="modules-grid">
@@ -195,6 +206,14 @@ function App() {
               <div className="module-status">
                 Status: {config.modules.taskbar_customizer.enabled ? '🟢 Active' : '⚫ Disabled'}
               </div>
+              {config.modules.taskbar_customizer.enabled && (
+                <button 
+                  onClick={() => setActiveModule('taskbar_customizer')}
+                  className="view-details-btn"
+                >
+                  View Details →
+                </button>
+              )}
             </div>
 
             {/* Mouse Action Mapper */}
