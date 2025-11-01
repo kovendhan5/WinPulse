@@ -11,6 +11,7 @@ use modules::{
     clipboard_history::{ClipboardHistory, ClipboardItem},
     dynamic_split::DynamicSplit,
     taskbar_customizer::TaskbarCustomizer,
+    mouse_action_mapper::MouseActionMapper,
 };
 
 // Global state for process controller
@@ -19,6 +20,7 @@ struct AppState {
     clipboard_history: Mutex<ClipboardHistory>,
     dynamic_split: Mutex<DynamicSplit>,
     taskbar_customizer: Mutex<TaskbarCustomizer>,
+    mouse_action_mapper: Mutex<MouseActionMapper>,
 }
 
 // Configuration structures matching the frontend types
@@ -198,8 +200,8 @@ async fn enable_module(module_name: String, state: tauri::State<'_, AppState>) -
             tc.enable().map_err(|e| e.to_string())
         }
         "mouse_action_mapper" => {
-            // TODO: Initialize mouse hooks
-            Ok(())
+            let mut mam = state.mouse_action_mapper.lock().map_err(|e| e.to_string())?;
+            mam.enable().map_err(|e| e.to_string())
         }
         "process_controller" => {
             // Already initialized in app state
@@ -225,6 +227,10 @@ async fn disable_module(module_name: String, state: tauri::State<'_, AppState>) 
         "taskbar_customizer" => {
             let mut tc = state.taskbar_customizer.lock().map_err(|e| e.to_string())?;
             tc.disable().map_err(|e| e.to_string())
+        }
+        "mouse_action_mapper" => {
+            let mut mam = state.mouse_action_mapper.lock().map_err(|e| e.to_string())?;
+            mam.disable().map_err(|e| e.to_string())
         }
         "clipboard_history" => {
             let mut clipboard = state.clipboard_history.lock().map_err(|e| e.to_string())?;
@@ -309,6 +315,18 @@ async fn get_taskbar_status(state: tauri::State<'_, AppState>) -> Result<bool, S
     Ok(tc.is_taskbar_visible())
 }
 
+#[tauri::command]
+async fn trigger_screenshot(state: tauri::State<'_, AppState>) -> Result<(), String> {
+    let mam = state.mouse_action_mapper.lock().map_err(|e| e.to_string())?;
+    mam.take_screenshot().map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+async fn launch_application(app_name: String, state: tauri::State<'_, AppState>) -> Result<(), String> {
+    let mam = state.mouse_action_mapper.lock().map_err(|e| e.to_string())?;
+    mam.launch_app(&app_name).map_err(|e| e.to_string())
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     env_logger::init();
@@ -320,6 +338,7 @@ pub fn run() {
             clipboard_history: Mutex::new(ClipboardHistory::new()),
             dynamic_split: Mutex::new(DynamicSplit::new()),
             taskbar_customizer: Mutex::new(TaskbarCustomizer::new()),
+            mouse_action_mapper: Mutex::new(MouseActionMapper::new()),
         })
         .setup(|app| {
             // Initialize logging
@@ -346,7 +365,9 @@ pub fn run() {
             apply_window_layout,
             cycle_window_layout,
             toggle_taskbar,
-            get_taskbar_status
+            get_taskbar_status,
+            trigger_screenshot,
+            launch_application
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
