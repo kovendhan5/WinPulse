@@ -1,0 +1,118 @@
+.mouse-action-mapper {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.mouse-action-mapper h2 {
+  color: #fff;
+  margin-bottom: 0.5rem;
+}
+
+.mouse-action-mapper p {
+  color: #aaa;
+  margin-bottom: 1.5rem;
+}
+
+.action-section {
+  background: #1a1a1a;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid #333;
+}
+
+.action-section h3 {
+  color: #fff;
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+}
+
+.action-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.action-btn {
+  padding: 1rem;
+  border-radius: 8px;
+  border: none;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: white;
+}
+
+.action-btn.screenshot {
+  background: linear-gradient(135deg, #9b59b6, #8e44ad);
+}
+
+.action-btn.screenshot:hover:not(:disabled) {
+  background: linear-gradient(135deg, #8e44ad, #7d3c98);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(155, 89, 182, 0.4);
+}
+
+.action-btn.launch {
+  background: linear-gradient(135deg, #3498db, #2980b9);
+}
+
+.action-btn.launch:hover:not(:disabled) {
+  background: linear-gradient(135deg, #2980b9, #21618c);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(52, 152, 219, 0.4);
+}
+
+.action-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.action-description {
+  grid-column: 1 / -1;
+  color: #888;
+  font-size: 0.9rem;
+  margin: 0;
+  padding: 0.5rem;
+  background: #0a0a0a;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.info-box {
+  background: #2a2a2a;
+  border-left: 4px solid #9b59b6;
+  border-radius: 6px;
+  padding: 1rem 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.info-box h4 {
+  color: #9b59b6;
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+  font-size: 1rem;
+}
+
+.info-box ul {
+  margin: 0;
+  padding-left: 1.5rem;
+  color: #ccc;
+}
+
+.info-box li {
+  margin-bottom: 0.5rem;
+}
+
+.message {
+  margin-top: 1rem;
+  color: #ddd;
+  background: #222;
+  padding: 0.75rem;
+  border-radius: 6px;
+  text-align: center;
+  font-weight: 500;
+}

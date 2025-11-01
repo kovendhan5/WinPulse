@@ -5,6 +5,7 @@ import { ProcessController } from './components/ProcessController';
 import { ClipboardHistory } from './components/ClipboardHistory';
 import { DynamicSplit } from './components/DynamicSplit';
 import { TaskbarCustomizer } from './components/TaskbarCustomizer';
+import { MouseActionMapper } from './components/MouseActionMapper';
 
 // Types for our module configuration
 interface ModuleConfig {
@@ -159,6 +160,16 @@ function App() {
           </button>
           <TaskbarCustomizer />
         </div>
+      ) : activeModule === 'mouse_action_mapper' ? (
+        <div>
+          <button 
+            onClick={() => setActiveModule(null)} 
+            className="back-btn"
+          >
+            ← Back to Dashboard
+          </button>
+          <MouseActionMapper />
+        </div>
       ) : (
         <>
           <div className="modules-grid">
@@ -233,6 +244,14 @@ function App() {
               <div className="module-status">
                 Status: {config.modules.mouse_action_mapper.enabled ? '🟢 Active' : '⚫ Disabled'}
               </div>
+              {config.modules.mouse_action_mapper.enabled && (
+                <button 
+                  onClick={() => setActiveModule('mouse_action_mapper')}
+                  className="view-details-btn"
+                >
+                  View Details →
+                </button>
+              )}
             </div>
 
             {/* Process Controller */}
