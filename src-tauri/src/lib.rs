@@ -4,6 +4,12 @@ use std::fs;
 use std::path::PathBuf;
 use std::sync::Mutex;
 
+use tauri::{
+    tray::{TrayIconBuilder, TrayIconEvent},
+    menu::{Menu, MenuItem, PredefinedMenuItem},
+    Manager, AppHandle,
+};
+
 mod modules;
 use modules::Module;
 use modules::{
@@ -345,6 +351,69 @@ pub fn run() {
             log::info!("WinShaper starting up...");
             log::info!("Platform: Windows");
             log::info!("Version: 0.1.0 (MVP)");
+            
+            // Setup system tray
+            let quit_item = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
+            let show_item = MenuItem::with_id(app, "show", "Show Window", true, None::<&str>)?;
+            let hide_item = MenuItem::with_id(app, "hide", "Hide Window", true, None::<&str>)?;
+            let separator = PredefinedMenuItem::separator(app)?;
+            
+            let menu = Menu::with_items(app, &[
+                &show_item,
+                &hide_item,
+                &separator,
+                &quit_item,
+            ])?;
+            
+            let _tray = TrayIconBuilder::new()
+                .menu(&menu)
+                .icon(app.default_window_icon().unwrap().clone())
+                .on_menu_event(|app, event| {
+                    match event.id.as_ref() {
+                        "quit" => {
+                            log::info!("Quit requested from tray");
+                            app.exit(0);
+                        }
+                        "show" => {
+                            if let Some(window) = app.get_webview_window("main") {
+                                let _ = window.show();
+                                let _ = window.set_focus();
+                            }
+                        }
+                        "hide" => {
+                            if let Some(window) = app.get_webview_window("main") {
+                                let _ = window.hide();
+                            }
+                        }
+                        _ => {}
+                    }
+                })
+                .on_tray_icon_event(|tray, event| {
+                    if let TrayIconEvent::Click { button: tauri::tray::MouseButton::Left, .. } = event {
+                        let app = tray.app_handle();
+                        if let Some(window) = app.get_webview_window("main") {
+                            if window.is_visible().unwrap_or(false) {
+                                let _ = window.hide();
+                            } else {
+                                let _ = window.show();
+                                let _ = window.set_focus();
+                            }
+                        }
+                    }
+                })
+                .build(app)?;
+            
+            // Handle window close event - minimize to tray instead
+            if let Some(window) = app.get_webview_window("main") {
+                window.on_window_event(|event| {
+                    if let tauri::WindowEvent::CloseRequested { api, .. } = event {
+                        api.prevent_close();
+                        if let Some(window) = event.window().app_handle().get_webview_window("main") {
+                            let _ = window.hide();
+                        }
+                    }
+                });
+            }
             
             Ok(())
         })

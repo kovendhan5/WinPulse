@@ -29,7 +29,7 @@ export function ProcessController() {
 
   useEffect(() => {
     loadProcesses();
-    const interval = setInterval(loadProcesses, 3000); // Refresh every 3 seconds
+    const interval = setInterval(loadProcesses, 5000); // Refresh every 5 seconds (optimized)
     return () => clearInterval(interval);
   }, []);
 

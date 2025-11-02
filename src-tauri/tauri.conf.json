@@ -22,11 +22,20 @@
         "maximizable": true,
         "minimizable": true,
         "closable": true,
-        "decorations": true
+        "decorations": true,
+        "label": "main",
+        "hiddenTitle": false
       }
     ],
+    "withGlobalTauri": true,
     "security": {
       "csp": null
+    },
+    "trayIcon": {
+      "iconPath": "icons/icon.png",
+      "iconAsTemplate": false,
+      "menuOnLeftClick": false,
+      "title": "WinShaper"
     }
   },
   "bundle": {
