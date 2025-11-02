@@ -30,7 +30,7 @@ export function ClipboardHistory() {
 
   useEffect(() => {
     loadHistory();
-    const interval = setInterval(loadHistory, 2000); // Check every 2 seconds
+    const interval = setInterval(loadHistory, 3000); // Check every 3 seconds (optimized)
     return () => clearInterval(interval);
   }, []);
 
