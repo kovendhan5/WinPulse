@@ -1,4 +1,4 @@
-# WinPulse — Product Requirements Document (PRD)
+# WinShaper — Product Requirements Document (PRD)
 
 Date: October 25, 2025  
 Version: 1.0 (MVP Release)  
@@ -9,10 +9,10 @@ License: MIT
 
 ## 1. Overview
 
-Product Name: WinPulse
+Product Name: WinShaper
 
 Product Description  
-WinPulse is a lightweight, open-source Windows customization utility that serves as a modular hub for enhancing user control over the OS. It integrates a wide variety of features inspired by tools like PowerToys, Rainmeter, Ditto and other small utilities to provide productivity, customization and performance tools in a single, low-overhead package.
+WinShaper is a lightweight, open-source Windows customization utility that serves as a modular hub for enhancing user control over the OS. It integrates a wide variety of features inspired by tools like PowerToys, Rainmeter, Ditto and other small utilities to provide productivity, customization and performance tools in a single, low-overhead package.
 
 Primary Goal: Create a user-centric, low-resource alternative to PowerToys that covers diverse use cases (productivity, creativity, gaming, maintenance) through modular features.
 
@@ -44,7 +44,7 @@ Success Metrics:
 - Tech Stack: Rust + Tauri for low overhead (C# + WPF as an alternative if needed).
 - Constraints: Minimize external dependencies; some tweaks will require admin rights (prompt user).
 - Assumptions: Users have basic technical literacy.
-- Storage & License: Config stored in %APPDATA%/WinPulse and project released under MIT license.
+- Storage & License: Config stored in %APPDATA%/WinShaper and project released under MIT license.
 
 ---
 
@@ -174,7 +174,7 @@ Focus: Niche but useful extras.
 
 - Core: Small executable providing tray icon, module loader, and dashboard UI (Tauri + Rust recommended).
 - Modules: Implemented as dynamically-loadable modules (DLLs or WASM). Event-driven hooks via windows-rs, enigo, or equivalent libraries.
-- Storage: JSON configuration stored in %APPDATA%/WinPulse (e.g., `%APPDATA%\\WinPulse\\config.json`).
+- Storage: JSON configuration stored in %APPDATA%/WinShaper (e.g., `%APPDATA%\WinShaper\config.json`).
 - Testing: Unit tests (Rust built-in), integration tests on Windows 10/11, performance benchmarks compared vs. alternatives (PowerToys).
 - Deployment: GitHub Releases with installers (.exe / .msi). Auto-update support planned for future releases.
 
@@ -201,7 +201,7 @@ Focus: Niche but useful extras.
 
 ## Appendix
 
-- Configuration example (stored in `%APPDATA%/WinPulse\\config.json`):
+- Configuration example (stored in `%APPDATA%/WinShaper\config.json`):
 ```json
 {
   "modules": {
