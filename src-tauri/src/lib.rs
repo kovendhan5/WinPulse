@@ -7,7 +7,7 @@ use std::sync::Mutex;
 use tauri::{
     tray::{TrayIconBuilder, TrayIconEvent},
     menu::{Menu, MenuItem, PredefinedMenuItem},
-    Manager, AppHandle,
+    Manager,
 };
 
 mod modules;
@@ -405,10 +405,11 @@ pub fn run() {
             
             // Handle window close event - minimize to tray instead
             if let Some(window) = app.get_webview_window("main") {
-                window.on_window_event(|event| {
+                let app_handle = app.handle().clone();
+                window.on_window_event(move |event| {
                     if let tauri::WindowEvent::CloseRequested { api, .. } = event {
                         api.prevent_close();
-                        if let Some(window) = event.window().app_handle().get_webview_window("main") {
+                        if let Some(window) = app_handle.get_webview_window("main") {
                             let _ = window.hide();
                         }
                     }

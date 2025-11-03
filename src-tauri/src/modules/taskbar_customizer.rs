@@ -3,7 +3,6 @@ use std::collections::HashMap;
 use anyhow::Result;
 use serde_json::Value;
 
-use windows::Win32::Foundation::HWND;
 use windows::Win32::UI::WindowsAndMessaging::{
     FindWindowW, ShowWindow, SW_HIDE, SW_SHOW,
 };
@@ -37,8 +36,8 @@ impl TaskbarCustomizer {
     /// Set taskbar visibility explicitly
     pub fn set_taskbar_visibility(&mut self, visible: bool) -> Result<()> {
         unsafe {
-            let hwnd = FindWindowW(w!("Shell_TrayWnd"), None)?;
-            if hwnd.0 == 0 {
+            let hwnd = FindWindowW(w!("Shell_TrayWnd"), None);
+            if hwnd.0.is_null() {
                 return Err(anyhow::anyhow!("Taskbar window not found"));
             }
 

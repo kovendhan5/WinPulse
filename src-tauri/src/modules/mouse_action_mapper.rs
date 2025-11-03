@@ -3,7 +3,6 @@ use std::collections::HashMap;
 use anyhow::Result;
 use serde_json::Value;
 use std::process::Command;
-use std::path::PathBuf;
 
 use windows::Win32::UI::Input::KeyboardAndMouse::{
     keybd_event, KEYEVENTF_KEYUP, VK_SNAPSHOT,

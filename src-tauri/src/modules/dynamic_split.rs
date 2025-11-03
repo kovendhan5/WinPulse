@@ -30,8 +30,8 @@ impl DynamicSplit {
     pub fn apply_layout(&mut self, layout: &str) -> Result<()> {
         unsafe {
             let hwnd = GetForegroundWindow();
-            if hwnd.0 == 0 {
-                return Err(anyhow::anyhow!("No foreground window"));
+            if hwnd.0.is_null() {
+                return Err(anyhow::anyhow!("No foreground window found"));
             }
 
             let screen_w = GetSystemMetrics(SM_CXSCREEN);
@@ -47,8 +47,8 @@ impl DynamicSplit {
             };
 
             let flags = SWP_NOZORDER | SWP_SHOWWINDOW;
-            let ok = SetWindowPos(hwnd, HWND(0), x, y, w, h, flags).as_bool();
-            if !ok {
+            let ok = SetWindowPos(hwnd, HWND(std::ptr::null_mut()), x, y, w, h, flags).is_ok();
+            if ok {
                 return Err(anyhow::anyhow!("SetWindowPos failed"));
             }
 
