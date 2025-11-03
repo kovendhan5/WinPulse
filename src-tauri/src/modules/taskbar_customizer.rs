@@ -36,7 +36,7 @@ impl TaskbarCustomizer {
     /// Set taskbar visibility explicitly
     pub fn set_taskbar_visibility(&mut self, visible: bool) -> Result<()> {
         unsafe {
-            let hwnd = FindWindowW(w!("Shell_TrayWnd"), None);
+            let hwnd = FindWindowW(w!("Shell_TrayWnd"), None)?;
             if hwnd.0.is_null() {
                 return Err(anyhow::anyhow!("Taskbar window not found"));
             }
