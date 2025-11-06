@@ -42,7 +42,7 @@ impl TaskbarCustomizer {
             }
 
             let cmd = if visible { SW_SHOW } else { SW_HIDE };
-            ShowWindow(hwnd, cmd);
+            let _ = ShowWindow(hwnd, cmd);
             
             self.taskbar_visible = visible;
             log::info!("Taskbar visibility set to: {}", visible);
